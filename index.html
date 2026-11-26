@@ -12,7 +12,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 
-  <!-- Three.js is loaded as an ES module through this import map -->
   <script type="importmap">
   {
     "imports": {
@@ -24,7 +23,6 @@
 </head>
 <body>
 
-<!-- Icon sprite -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
     <symbol id="i-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z"/><path d="M19 16l.9 2.1L22 19l-2.1.9L19 22l-.9-2.1L16 19l2.1-.9z"/></symbol>
@@ -44,7 +42,6 @@
 
 <div class="bg-glow" aria-hidden="true"></div>
 
-<!-- Splash while auth state resolves -->
 <div id="splash" class="splash"><div class="spinner"></div></div>
 
 <header class="topbar" id="topbar" hidden>
@@ -215,11 +212,12 @@
     <form class="panel settings-form" id="settingsForm" autocomplete="off">
       <h2>Groq (AI)</h2>
       <label class="field"><span>Groq API key</span><input id="setGroqKey" type="password" placeholder="gsk_…" autocomplete="off"></label>
+
       <div class="two">
         <label class="field">
           <span>Script model</span>
           <select id="setChatModel"></select>
-          <small class="hint">Free models on Groq. Pick one, then use “Test Groq key” to confirm it's available to your account.</small>
+          <small class="hint">Free models on Groq. Pick one, then use “Test Groq key” to confirm it's available.</small>
         </label>
         <label class="field">
           <span>Voices</span>
@@ -229,7 +227,13 @@
           </select>
         </label>
       </div>
-      <label class="field"><span>Groq TTS model</span><input id="setTtsModel" type="text"></label>
+
+      <label class="field">
+        <span>Groq TTS model</span>
+        <input id="setTtsModel" type="text" placeholder="Click Detect TTS model below">
+        <small class="hint">Groq retires TTS models often. Click <b>Detect TTS model</b> to find one your key can use right now.</small>
+      </label>
+
       <p class="hint">Your Groq key lives in the browser, so anyone using this device can read it. Fine for building and testing. Before public launch, move the Groq calls behind a small serverless function.</p>
 
       <h2>Cloudinary (video storage)</h2>
@@ -241,6 +245,7 @@
       <div class="actions left">
         <button class="btn primary" type="submit">Save settings</button>
         <button class="btn ghost" type="button" id="btnTestGroq">Test Groq key</button>
+        <button class="btn ghost" type="button" id="btnDetectTTS">Detect TTS model</button>
         <button class="btn ghost danger" type="button" id="btnResetSettings">Clear settings</button>
       </div>
     </form>
