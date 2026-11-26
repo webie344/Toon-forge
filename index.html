@@ -216,7 +216,11 @@
       <h2>Groq (AI)</h2>
       <label class="field"><span>Groq API key</span><input id="setGroqKey" type="password" placeholder="gsk_…" autocomplete="off"></label>
       <div class="two">
-        <label class="field"><span>Script model</span><input id="setChatModel" type="text"></label>
+        <label class="field">
+          <span>Script model</span>
+          <select id="setChatModel"></select>
+          <small class="hint">Free models on Groq. Pick one, then use “Test Groq key” to confirm it's available to your account.</small>
+        </label>
         <label class="field">
           <span>Voices</span>
           <select id="setTtsProvider">
@@ -237,6 +241,7 @@
       <div class="actions left">
         <button class="btn primary" type="submit">Save settings</button>
         <button class="btn ghost" type="button" id="btnTestGroq">Test Groq key</button>
+        <button class="btn ghost danger" type="button" id="btnResetSettings">Clear settings</button>
       </div>
     </form>
   </section>
