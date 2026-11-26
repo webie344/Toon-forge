@@ -40,11 +40,29 @@ const CONFIG = {
     
   },
   groq: {
-    chatModel: 'llama-3.3-70b-versatile',
-    ttsModel: 'canopylabs/orpheus-v1-english', // check Groq's current TTS models; change in Settings
+    // Default chat model. Can be overridden in Settings.
+    // Free / available models on Groq (as of late 2026):
+    //   - meta-llama/llama-4-scout-17b-16e-instruct   (recommended)
+    //   - meta-llama/llama-4-maverick-17b-128e-instruct
+    //   - openai/gpt-oss-120b
+    //   - openai/gpt-oss-20b
+    //   - qwen/qwen3-32b
+    //   - llama-3.1-8b-instant
+    chatModel: 'meta-llama/llama-4-scout-17b-16e-instruct',
+    ttsModel: 'canopylabs/orpheus-v1-english',
   },
   modelUrl: 'Soldier.glb',
 };
+
+// Curated list of free Groq chat models shown in Settings.
+const GROQ_CHAT_MODELS = [
+  { id: 'meta-llama/llama-4-scout-17b-16e-instruct',    label: 'Llama 4 Scout 17B (fast, recommended)' },
+  { id: 'meta-llama/llama-4-maverick-17b-128e-instruct',label: 'Llama 4 Maverick 17B (smarter)' },
+  { id: 'openai/gpt-oss-120b',                          label: 'GPT-OSS 120B (strong reasoning)' },
+  { id: 'openai/gpt-oss-20b',                           label: 'GPT-OSS 20B (balanced)' },
+  { id: 'qwen/qwen3-32b',                               label: 'Qwen3 32B' },
+  { id: 'llama-3.1-8b-instant',                         label: 'Llama 3.1 8B Instant (cheapest)' },
+];
 
 /* ---------------------------------------------------------------------
    Small helpers
@@ -76,7 +94,7 @@ const slug = (s) => (s || 'toon').toLowerCase().replace(/[^a-z0-9]+/g, '-').repl
 /* ---------------------------------------------------------------------
    Settings (browser only)
    --------------------------------------------------------------------- */
-const SETTINGS_KEY = 'toonforge.settings.v1';
+const SETTINGS_KEY = 'toonforge.settings.v2'; // bumped: invalidates old saved model names
 const settingsDefaults = () => ({
   groqKey: '',
   chatModel: CONFIG.groq.chatModel,
@@ -444,9 +462,13 @@ async function generateScript({ idea, genre, length, cast }) {
 
 async function groqError(res, prefix) {
   let msg = `${res.status}`;
-  try { const j = await res.json(); msg = j.error?.message || msg; } catch { /* */ }
+  let body = {};
+  try { body = await res.json(); msg = body.error?.message || msg; } catch { /* */ }
   if (res.status === 401) msg = 'Groq rejected the API key. Check it in Settings.';
   if (res.status === 429) msg = 'Groq rate limit reached. Wait a moment and try again.';
+  if (/model|does not exist|no access|decommissioned|not found/i.test(msg)) {
+    msg = `The chat model "${state.settings.chatModel}" is not available on Groq (it may have been retired). Open Settings and pick a current model. Groq said: ${msg}`;
+  }
   return `${prefix}: ${msg}`;
 }
 
@@ -1511,32 +1533,73 @@ function openProject(p) {
 /* ---------- Settings ---------- */
 function fillSettings() {
   const s = state.settings;
-  $('#setGroqKey').value = s.groqKey; $('#setChatModel').value = s.chatModel;
-  $('#setTtsProvider').value = s.ttsProvider; $('#setTtsModel').value = s.ttsModel;
-  $('#setCloudName').value = s.cloudName; $('#setUploadPreset').value = s.uploadPreset;
+  $('#setGroqKey').value = s.groqKey;
+
+  // Build the model dropdown
+  const sel = $('#setChatModel');
+  sel.innerHTML = '';
+  GROQ_CHAT_MODELS.forEach((m) => {
+    const o = document.createElement('option');
+    o.value = m.id; o.textContent = m.label;
+    sel.appendChild(o);
+  });
+  // If the saved model is not in the list, add it as a custom option
+  if (s.chatModel && !GROQ_CHAT_MODELS.some((m) => m.id === s.chatModel)) {
+    const o = document.createElement('option');
+    o.value = s.chatModel; o.textContent = `${s.chatModel} (custom)`;
+    sel.appendChild(o);
+  }
+  sel.value = s.chatModel;
+
+  $('#setTtsProvider').value = s.ttsProvider;
+  $('#setTtsModel').value = s.ttsModel;
+  $('#setCloudName').value = s.cloudName;
+  $('#setUploadPreset').value = s.uploadPreset;
 }
+
 function initSettings() {
   $('#settingsForm').addEventListener('submit', (e) => {
     e.preventDefault();
     state.settings = {
       groqKey: $('#setGroqKey').value.trim(),
-      chatModel: $('#setChatModel').value.trim() || CONFIG.groq.chatModel,
+      chatModel: $('#setChatModel').value,
       ttsProvider: $('#setTtsProvider').value,
       ttsModel: $('#setTtsModel').value.trim() || CONFIG.groq.ttsModel,
       cloudName: $('#setCloudName').value.trim(),
       uploadPreset: $('#setUploadPreset').value.trim(),
     };
     saveSettings(state.settings);
-    toast('Settings saved.', 'ok', 2500);
+    toast(`Settings saved. Chat model: ${state.settings.chatModel}`, 'ok', 3500);
   });
+
   $('#btnTestGroq').addEventListener('click', async () => {
     const key = $('#setGroqKey').value.trim();
     if (!key) return toast('Paste your Groq key first.', 'error');
     try {
+      // 1) check key works
       const r = await fetch(`${GROQ}/models`, { headers: { Authorization: `Bearer ${key}` } });
       if (!r.ok) throw new Error(await groqError(r, 'Key check failed'));
-      toast('Groq key works.', 'ok');
+      const j = await r.json();
+      const ids = (j.data || []).map((m) => m.id);
+      // 2) warn if selected model is missing from the account's list
+      const chosen = $('#setChatModel').value;
+      if (chosen && !ids.includes(chosen)) {
+        toast(`Key works, but "${chosen}" is NOT in your available models. Pick one of: ${ids.slice(0, 6).join(', ')}…`, 'error', 10000);
+      } else {
+        toast(`Groq key works. "${chosen}" is available.`, 'ok', 4000);
+      }
     } catch (e) { toast(e.message, 'error', 6000); }
+  });
+
+  // Clear-all button (removes stale settings)
+  $('#btnResetSettings')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (!confirm('Clear saved settings (Groq key, model, Cloudinary, etc.)?')) return;
+    try { localStorage.removeItem(SETTINGS_KEY); } catch { /* */ }
+    state.settings = loadSettings();
+    fillSettings();
+    toast('Settings cleared. Reloading…', 'ok', 1500);
+    setTimeout(() => location.reload(), 800);
   });
 }
 
