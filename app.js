@@ -107,12 +107,12 @@ const CAMERAS = ['wide', 'medium', 'close', 'low', 'side'];
 const MOVES = ['left', 'center', 'right', 'toward', 'away'];
 
 const CAST = [
-  { id: 'rex',   gender: 'male',   name: 'Sgt. Rex', role: 'Gruff, by-the-book leader',    color: '#4f7a3a', skin: '#c68a5e', hair: '#2b1d14', voice: 'troy',   pitch: 0.7,  rate: 0.95, height: 2.00 },
-  { id: 'nova',  gender: 'female', name: 'Nova',     role: 'Quick-witted ace',              color: '#2f6fd0', skin: '#8d5a3b', hair: '#111111', voice: 'hannah', pitch: 1.3,  rate: 1.05, height: 1.85 },
-  { id: 'viper', gender: 'female', name: 'Viper',    role: 'Cool, sarcastic rival',         color: '#7d3fa8', skin: '#f0c29b', hair: '#d8b45a', voice: 'daniel', pitch: 0.9,  rate: 1.0,  height: 1.90 },
-  { id: 'blaze', gender: 'male',   name: 'Blaze',    role: 'Hot-headed rookie',             color: '#d4561f', skin: '#e0a77d', hair: '#7a2f12', voice: 'austin', pitch: 1.1,  rate: 1.12, height: 1.90 },
-  { id: 'frost', gender: 'female', name: 'Frost',    role: 'Calm, dry-witted medic',        color: '#1b8a9c', skin: '#f3d2b3', hair: '#e8e8ec', voice: 'diana',  pitch: 1.15, rate: 0.95, height: 1.85 },
-  { id: 'ash',   gender: 'male',   name: 'Ash',      role: 'Silent type, sharp one-liners', color: '#5b5f6b', skin: '#a86f4a', hair: '#3a2a1a', voice: 'autumn', pitch: 1.0,  rate: 0.9,  height: 2.00 },
+  { id: 'rex',   gender: 'male',   name: 'Sgt. Rex', role: 'Gruff, by-the-book leader',    color: '#4f7a3a', skin: '#c68a5e', hair: '#2b1d14', voice: 'fahad',   pitch: 0.7,  rate: 0.95, height: 2.00 },
+  { id: 'nova',  gender: 'female', name: 'Nova',     role: 'Quick-witted ace',              color: '#2f6fd0', skin: '#8d5a3b', hair: '#111111', voice: 'noura',   pitch: 1.3,  rate: 1.05, height: 1.85 },
+  { id: 'viper', gender: 'female', name: 'Viper',    role: 'Cool, sarcastic rival',         color: '#7d3fa8', skin: '#f0c29b', hair: '#d8b45a', voice: 'lulwa',   pitch: 0.9,  rate: 1.0,  height: 1.90 },
+  { id: 'blaze', gender: 'male',   name: 'Blaze',    role: 'Hot-headed rookie',             color: '#d4561f', skin: '#e0a77d', hair: '#7a2f12', voice: 'sultan',  pitch: 1.1,  rate: 1.12, height: 1.90 },
+  { id: 'frost', gender: 'female', name: 'Frost',    role: 'Calm, dry-witted medic',        color: '#1b8a9c', skin: '#f3d2b3', hair: '#e8e8ec', voice: 'aisha',   pitch: 1.15, rate: 0.95, height: 1.85 },
+  { id: 'ash',   gender: 'male',   name: 'Ash',      role: 'Silent type, sharp one-liners', color: '#5b5f6b', skin: '#a86f4a', hair: '#3a2a1a', voice: 'abdullah',pitch: 1.0,  rate: 0.9,  height: 2.00 },
 ];
 const castById = (id) => CAST.find((c) => c.id === id);
 
