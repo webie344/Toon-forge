@@ -33,7 +33,7 @@ const CONFIG = {
     storageBucket: "crypto-6517d.firebasestorage.app",
     messagingSenderId: "60263975159",
     appId: "1:60263975159:web:bd53dcaad86d6ed9592bf2"
-,
+},
   cloudinary: {
     cloudName: 'ddtdqrh1b',
     uploadPreset: 'profile-pictures', // must be an *unsigned* preset
