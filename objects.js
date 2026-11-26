@@ -1,28 +1,12 @@
-
 /* =====================================================================
    objects.js — pre-built object library for Toonforge.
-
-   Usage from app.js:
-     import { buildObject, resolveObject, OBJECT_NAMES } from './objects.js';
-     const group = buildObject('canoe', toon);   // returns THREE.Group
-     const key   = resolveObject('boat');         // -> 'canoe' (alias) or null
-
-   If `resolveObject` returns null, `buildObject` still returns a
-   labeled fallback group so scenes never break on unknown objects.
-
-   All builders take a `toon(color)` function that returns a material.
-   That's the only dependency: the caller supplies it. No THREE import.
    ===================================================================== */
+
+import * as THREE from 'three';
 
 const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 
-/* Every entry:
-   { aliases: [...strings...], build: (toon) => THREE.Group }
-   Objects are built in local space around origin, facing +Z,
-   resting on y = 0 unless noted. */
 export const OBJECT_LIBRARY = {
-
-  /* ---------------- FOOD ---------------- */
   pizza: {
     aliases: ['pizza slice', 'slice of pizza', 'pepperoni pizza', 'pizza pie'],
     build: (toon) => {
@@ -127,8 +111,6 @@ export const OBJECT_LIBRARY = {
       return g;
     },
   },
-
-  /* ---------------- WEAPONS ---------------- */
   sword: {
     aliases: ['blade', 'katana', 'longsword', 'broadsword', 'rapier'],
     build: (toon) => {
@@ -199,8 +181,6 @@ export const OBJECT_LIBRARY = {
       return g;
     },
   },
-
-  /* ---------------- VEHICLES ---------------- */
   canoe: {
     aliases: ['boat', 'kayak', 'skiff', 'dugout', 'pirogue', 'rowboat', 'rowing boat'],
     build: (toon) => {
@@ -328,8 +308,6 @@ export const OBJECT_LIBRARY = {
       return g;
     },
   },
-
-  /* ---------------- NATURE ---------------- */
   tree: {
     aliases: ['oak', 'pine', 'fir', 'tree trunk'],
     build: (toon) => {
@@ -450,8 +428,6 @@ export const OBJECT_LIBRARY = {
       return g;
     },
   },
-
-  /* ---------------- FURNITURE ---------------- */
   chair: {
     aliases: ['seat', 'stool'],
     build: (toon) => {
@@ -561,8 +537,6 @@ export const OBJECT_LIBRARY = {
       return g;
     },
   },
-
-  /* ---------------- TECH ---------------- */
   phone: {
     aliases: ['mobile', 'cell phone', 'smartphone', 'iphone', 'android'],
     build: (toon) => {
@@ -664,8 +638,6 @@ export const OBJECT_LIBRARY = {
       return g;
     },
   },
-
-  /* ---------------- SPORTS ---------------- */
   ball: {
     aliases: ['soccer ball', 'football', 'beach ball', 'sphere ball', 'play ball'],
     build: (toon) => {
@@ -734,8 +706,6 @@ export const OBJECT_LIBRARY = {
       return g;
     },
   },
-
-  /* ---------------- FANTASY ---------------- */
   chest: {
     aliases: ['treasure chest', 'treasure', 'box of gold'],
     build: (toon) => {
@@ -791,8 +761,6 @@ export const OBJECT_LIBRARY = {
       return g;
     },
   },
-
-  /* ---------------- MUSICAL ---------------- */
   guitar: {
     aliases: ['acoustic guitar', 'electric guitar'],
     build: (toon) => {
@@ -850,8 +818,6 @@ export const OBJECT_LIBRARY = {
       return g;
     },
   },
-
-  /* ---------------- HOUSEHOLD ---------------- */
   bucket: {
     aliases: ['pail', 'water bucket'],
     build: (toon) => {
@@ -949,8 +915,6 @@ export const OBJECT_LIBRARY = {
       return g;
     },
   },
-
-  /* ---------------- OFFICE / SCHOOL ---------------- */
   book: {
     aliases: ['novel', 'textbook', 'notebook'],
     build: (toon) => {
@@ -1009,8 +973,6 @@ export const OBJECT_LIBRARY = {
       return g;
     },
   },
-
-  /* ---------------- MISC ---------------- */
   balloon: {
     aliases: ['party balloon', 'helium balloon'],
     build: (toon) => {
@@ -1107,26 +1069,22 @@ export const OBJECT_LIBRARY = {
   },
 };
 
-/* ---- Alias index, built once ---- */
 const ALIAS_INDEX = new Map();
 for (const [key, def] of Object.entries(OBJECT_LIBRARY)) {
   ALIAS_INDEX.set(norm(key), key);
   for (const a of def.aliases || []) ALIAS_INDEX.set(norm(a), key);
 }
 
-/** Resolve a free-form object name to a library key, or null. */
 export function resolveObject(name) {
   const n = norm(name);
   if (!n) return null;
   if (ALIAS_INDEX.has(n)) return ALIAS_INDEX.get(n);
-  // try partial match ("red canoe" → "canoe")
   for (const [alias, key] of ALIAS_INDEX) {
     if (n.includes(alias) || alias.includes(n)) return key;
   }
   return null;
 }
 
-/** Build an object by library name. Falls back to a labeled box. */
 export function buildObject(name, toon, fallbackColor = 0x888888) {
   const key = resolveObject(name);
   if (key) {
@@ -1134,7 +1092,6 @@ export function buildObject(name, toon, fallbackColor = 0x888888) {
     g.userData.resolved = key;
     return g;
   }
-  // Fallback: a colored box with the object's initial on it (so scenes still play).
   const g = new THREE.Group();
   const box = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), toon(fallbackColor));
   box.position.y = 0.25; g.add(box);
@@ -1143,5 +1100,4 @@ export function buildObject(name, toon, fallbackColor = 0x888888) {
   return g;
 }
 
-/** All canonical object names (for diagnostics, UI pickers, etc.). */
 export const OBJECT_NAMES = Object.keys(OBJECT_LIBRARY);
