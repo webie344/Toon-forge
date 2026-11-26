@@ -42,10 +42,8 @@ export function makeAvatar(member, toon) {
   const kneeY     = 0.28 * H;
   const shoulderY = 0.78 * H;
   
-  // Give them a proper neck and head placement
   const neckLen   = 0.08 * H;
   const headR     = 0.14 * H;
-  const headY     = shoulderY + neckLen + (headR * 0.8);
 
   const torsoLen   = shoulderY - hipY;
   const shoulderW  = (female ? 0.18 : 0.22) * H;
@@ -59,7 +57,6 @@ export function makeAvatar(member, toon) {
   hips.position.y = hipY;
   root.add(hips);
 
-  // Pelvis (rounded)
   const pelvis = new THREE.Mesh(new THREE.SphereGeometry(hipW * 0.9, 16, 12), pants);
   pelvis.scale.set(1, 0.6, 0.7);
   pelvis.position.y = 0.02 * H;
@@ -68,42 +65,35 @@ export function makeAvatar(member, toon) {
   const spine = new THREE.Group();
   hips.add(spine);
 
-  // Torso (tapered to look human, not boxy)
   const torsoGeo = new THREE.CylinderGeometry(shoulderW, hipW * 0.9, torsoLen, 16);
   const torso = new THREE.Mesh(torsoGeo, shirt);
   torso.position.y = torsoLen / 2;
-  torso.scale.set(1, 1, 0.65); // Flatten front-to-back for a cartoon look
+  torso.scale.set(1, 1, 0.65);
   spine.add(torso);
 
-  // Collar / shoulder area
   const collar = new THREE.Mesh(new THREE.SphereGeometry(shoulderW, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2), shirt);
   collar.scale.set(1, 0.5, 0.65);
   collar.position.y = torsoLen;
   spine.add(collar);
 
-  // VISIBLE NECK
   const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.045 * H, 0.055 * H, neckLen, 12), skin);
   neck.position.y = torsoLen + neckLen / 2;
   neck.scale.set(1, 1, 0.9);
   spine.add(neck);
 
-  // Head
   const head = new THREE.Group();
   head.position.y = torsoLen + neckLen + (headR * 0.8);
   spine.add(head);
 
-  // Skull (slightly egg-shaped)
   const skull = new THREE.Mesh(new THREE.SphereGeometry(headR, 24, 18), skin);
   skull.scale.set(0.95, 1.05, 0.95);
   head.add(skull);
 
-  // Jaw / Chin
   const jaw = new THREE.Mesh(new THREE.SphereGeometry(headR * 0.85, 16, 12), skin);
   jaw.scale.set(0.85, 0.6, 0.9);
   jaw.position.set(0, -headR * 0.4, headR * 0.1);
   head.add(jaw);
 
-  // Face Features
   const eyeR = headR * 0.13;
   const eyeLm = new THREE.Mesh(new THREE.SphereGeometry(eyeR, 12, 10), eyeW);
   const eyeRm = new THREE.Mesh(new THREE.SphereGeometry(eyeR, 12, 10), eyeW);
@@ -116,7 +106,6 @@ export function makeAvatar(member, toon) {
   pupilR.position.copy(eyeRm.position).add(new THREE.Vector3(0, 0, eyeR * 0.5));
   head.add(eyeLm, eyeRm, pupilL, pupilR);
 
-  // Brows
   const browGeo = new THREE.BoxGeometry(headR * 0.3, headR * 0.06, headR * 0.08);
   const browL = new THREE.Mesh(browGeo, hair);
   const browR = new THREE.Mesh(browGeo, hair);
@@ -124,26 +113,22 @@ export function makeAvatar(member, toon) {
   browR.position.set( headR * 0.35, headR * 0.28, headR * 0.85);
   head.add(browL, browR);
 
-  // Mouth (flattened sphere we can scale)
   const mouth = new THREE.Mesh(new THREE.SphereGeometry(headR * 0.15, 12, 8), mouthM);
   mouth.scale.set(1.4, 0.55, 0.3);
   mouth.position.set(0, -headR * 0.35, headR * 0.85);
   head.add(mouth);
 
-  // Nose
   const nose = new THREE.Mesh(new THREE.SphereGeometry(headR * 0.1, 8, 6), skin);
   nose.scale.set(1, 0.8, 1.2);
   nose.position.set(0, -headR * 0.05, headR * 0.95);
   head.add(nose);
 
-  // Hair
   if (female) {
     const bob = new THREE.Mesh(new THREE.SphereGeometry(headR * 1.05, 24, 18, 0, Math.PI * 2, 0, Math.PI * 0.65), hair);
     bob.position.set(0, headR * 0.15, -headR * 0.05);
     bob.scale.set(1.05, 1, 1.05);
     head.add(bob);
     
-    // Side locks
     const lockGeo = new THREE.CapsuleGeometry(headR * 0.15, headR * 0.8, 6, 8);
     const lockL = new THREE.Mesh(lockGeo, hair);
     const lockR = new THREE.Mesh(lockGeo, hair);
@@ -158,14 +143,12 @@ export function makeAvatar(member, toon) {
     head.add(cap);
   }
 
-  // Arms
   function makeArm(side) {
     const s = side === 'L' ? -1 : 1;
     const shoulder = new THREE.Group();
     shoulder.position.set(s * shoulderW * 0.85, torsoLen - 0.02 * H, 0);
     spine.add(shoulder);
 
-    // Upper arm
     const upper = new THREE.Mesh(new THREE.CapsuleGeometry(0.05 * H, armLen * 0.55, 8, 12), shirt);
     upper.position.y = -armLen * 0.3;
     shoulder.add(upper);
@@ -174,7 +157,6 @@ export function makeAvatar(member, toon) {
     elbow.position.y = -armLen * 0.55;
     shoulder.add(elbow);
 
-    // Forearm
     const fore = new THREE.Mesh(new THREE.CapsuleGeometry(0.045 * H, armLen * 0.5, 8, 12), skin);
     fore.position.y = -armLen * 0.28;
     elbow.add(fore);
@@ -183,7 +165,6 @@ export function makeAvatar(member, toon) {
     hand.position.y = -armLen * 0.55;
     elbow.add(hand);
 
-    // Hand
     const palm = new THREE.Mesh(new THREE.SphereGeometry(0.055 * H, 12, 10), skin);
     palm.scale.set(0.9, 1.1, 0.6);
     hand.add(palm);
@@ -193,7 +174,6 @@ export function makeAvatar(member, toon) {
   const armL = makeArm('L');
   const armR = makeArm('R');
 
-  // Legs
   function makeLeg(side) {
     const s = side === 'L' ? -1 : 1;
     const hip = new THREE.Group();
@@ -216,10 +196,8 @@ export function makeAvatar(member, toon) {
     foot.position.y = -shinLen;
     knee.add(foot);
 
-    // Shoe
     const shoeMesh = new THREE.Mesh(new THREE.BoxGeometry(0.1 * H, footH, 0.18 * H), shoe);
     shoeMesh.position.set(0, -footH / 2, 0.04 * H);
-    // Round the shoe slightly
     shoeMesh.geometry.translate(0, 0, 0.02); 
     foot.add(shoeMesh);
 
